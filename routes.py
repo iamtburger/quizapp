@@ -2,6 +2,8 @@ from flask import render_template, url_for, flash, redirect, request, session
 from quizapp import app, db
 from quizapp.forms import NewQuiz, NewQuestion
 from quizapp.models import Quiz, Question, Answer
+from werkzeug.utils import secure_filename
+import os
 
 @app.route('/')
 def index():
@@ -16,6 +18,13 @@ def login():
 def quiz():
     return render_template('quiz.html')
 
+def save_picture(form_picture):
+    image = form_picture
+    image_filename = secure_filename(image.filename)
+    image.save(os.path.join(app.root_path, 'images', image_filename))
+
+    return image_filename
+
 @app.route('/addquestion/', methods=["GET", "POST"])
 def addquestion():
 
@@ -25,21 +34,20 @@ def addquestion():
 
     if request.method == "POST":
 
-        question = Question(qtext=form.qtext.data, qpic=form.qpic.data, quiz_id=quizname )
+        qimage = save_picture(form.qpic.data)
+        question = Question(qtext=form.qtext.data, qpic=qimage, quiz_id=quizname)
         db.session.add(question)
         db.session.commit()
 
         q_id = question.id
-        answer1 = Answer(atext=form.atext1.data, apic=form.apic1.data, correct=form.correct1.data, question_id=q_id)
-        answer2 = Answer(atext=form.atext2.data, apic=form.apic2.data, correct=form.correct2.data, question_id=q_id)
-        answer3 = Answer(atext=form.atext3.data, apic=form.apic3.data, correct=form.correct3.data, question_id=q_id)
-        answer4 = Answer(atext=form.atext4.data, apic=form.apic4.data, correct=form.correct4.data, question_id=q_id)
 
-        db.session.add(answer1)
-        db.session.add(answer2)
-        db.session.add(answer3)
-        db.session.add(answer4)
-        db.session.commit()
+        allanswers = [[form.apic1.data, form.atext1.data, form.correct1.data], [form.apic2.data, form.atext2.data, form.correct2.data], [form.apic3.data, form.atext3.data, form.correct3.data], [form.apic4.data, form.atext4.data, form.correct4.data]]
+        for a, b, c in allanswers:
+            aimage = save_picture(a)
+            answer = Answer(atext=b, apic=aimage, correct=c, question_id=q_id)
+            db.session.add(answer)
+            db.session.commit()
+
 
         flash('Question has been added!', 'success')
 
