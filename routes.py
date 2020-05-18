@@ -1,7 +1,7 @@
-from flask import render_template, url_for, flash, redirect, request
-from quizing import app, db
-from quizing.forms import NewQuiz
-from quizing.models import Quiz
+from flask import render_template, url_for, flash, redirect, request, session
+from quizapp import app, db
+from quizapp.forms import NewQuiz, NewQuestion
+from quizapp.models import Quiz, Question, Answer
 
 @app.route('/')
 def index():
@@ -16,21 +16,24 @@ def login():
 def quiz():
     return render_template('quiz.html')
 
-@app.route('/addquestion/<quizname>', methods=["GET", "POST"])
-def addquestion(quizname):
+@app.route('/addquestion/', methods=["GET", "POST"])
+def addquestion():
 
+    form = NewQuestion()
     #javítani a quiz id részt, melyik legyen a primary key???
+    quizname = session['q_id']
 
     if request.method == "POST":
 
-        question = NewQuestion(qtext=form.qtext.data, qpic=form.qpic.data, quiz_id=quizname )
+        question = Question(qtext=form.qtext.data, qpic=form.qpic.data, quiz_id=quizname )
         db.session.add(question)
+        db.session.commit()
 
         q_id = question.id
-        anwser1 = NewQuestion(atext=form.atext1.data, apic=form.apic1.data, correct=form.correct1.data, question_id=q_id)
-        anwser2 = NewQuestion(atext=form.atext2.data, apic=form.apic2.data, correct=form.correct2.data, question_id=q_id)
-        anwser3 = NewQuestion(atext=form.atext3.data, apic=form.apic3.data, correct=form.correct3.data, question_id=q_id)
-        anwser4 = NewQuestion(atext=form.atext4.data, apic=form.apic4.data, correct=form.correct4.data, question_id=q_id)
+        answer1 = Answer(atext=form.atext1.data, apic=form.apic1.data, correct=form.correct1.data, question_id=q_id)
+        answer2 = Answer(atext=form.atext2.data, apic=form.apic2.data, correct=form.correct2.data, question_id=q_id)
+        answer3 = Answer(atext=form.atext3.data, apic=form.apic3.data, correct=form.correct3.data, question_id=q_id)
+        answer4 = Answer(atext=form.atext4.data, apic=form.apic4.data, correct=form.correct4.data, question_id=q_id)
 
         db.session.add(answer1)
         db.session.add(answer2)
@@ -45,7 +48,7 @@ def addquestion(quizname):
         return redirect(url_for('addquestion', quizname=quizname))
 
     else:
-        return render_template('add-question.html')
+        return render_template('addquestion.html', form=form)
 
 @app.route('/add-quiz', methods=["GET", "POST"])
 def addquiz():
@@ -54,17 +57,17 @@ def addquiz():
     if request.method == "POST":
 
         quiz = Quiz(quizname=form.quizname.data, quiztitle=form.quiztitle.data)
-        quizname = form.quizname.data
 
         db.session.add(quiz)
         db.session.commit()
 
+        session['q_id'] = quiz.id
+
         # ezt ellenőrizni, hogy működik-e és ezt átadni? akkor viszont javítani kell a következő oldalon a paramétereket!
-        q_id = quiz.id
 
         flash('The quiz has been created. Now add a question!', 'success')
 
-        return redirect(url_for('addquestion', quizname=quizname))
+        return redirect(url_for('addquestion', quizname=session['q_id']))
 
     else:
         return render_template('add-quiz.html', form=form)

@@ -1,4 +1,4 @@
-from quizing import db
+from quizapp import db
 
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)

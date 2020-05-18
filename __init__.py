@@ -11,4 +11,4 @@ db = SQLAlchemy(app)
 with app.app_context():
     db.create_all()
 
-from quizing import routes
+from quizapp import routes

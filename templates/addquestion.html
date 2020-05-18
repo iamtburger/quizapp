@@ -1,0 +1,112 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="content-section">
+  <form class="" method="POST">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Create New Question</legend>
+      <div class="form-group">
+            {{ form.qtext.label(class="form-control-label") }}
+            {{ form.qtext(class="form-control-lg") }}
+      </div>
+      <div class="form-group">
+            {{ form.qpic.label() }}
+            {{ form.qpic(class="form-control-file") }}
+            {% if form.qpic.errors %}
+              {% for error in form.qpic.errors %}
+                  <span class="text-danger">{{ error }}</span></br>
+              {% endfor %}
+            {% endif %}
+      </div>
+    </fieldset>
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add Answers</legend>
+      <div class="form-group">
+            {{ form.atext1.label(class="form-control-label") }}
+            {{ form.atext1(class="form-control-lg") }}
+      </div>
+      <div class="form-group">
+            {{ form.apic1.label() }}
+            {{ form.apic1(class="form-control-file") }}
+            {% if form.apic1.errors %}
+              {% for error in form.apic1.errors %}
+                  <span class="text-danger">{{ error }}</span></br>
+              {% endfor %}
+            {% endif %}
+      </div>
+      <div class="form-check">
+            {{ form.correct1(class="form-check-input") }}
+            {{ form.correct1.label(class="form-check-label") }}
+      </div>
+    </fieldset>
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add Answers</legend>
+      <div class="form-group">
+            {{ form.atext2.label(class="form-control-label") }}
+            {{ form.atext2(class="form-control-lg") }}
+      </div>
+      <div class="form-group">
+            {{ form.apic2.label() }}
+            {{ form.apic2(class="form-control-file") }}
+            {% if form.apic2.errors %}
+              {% for error in form.apic2.errors %}
+                  <span class="text-danger">{{ error }}</span></br>
+              {% endfor %}
+            {% endif %}
+      </div>
+      <div class="form-check">
+            {{ form.correct2(class="form-check-input") }}
+            {{ form.correct2.label(class="form-check-label") }}
+      </div>
+    </fieldset>
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add Answers</legend>
+      <div class="form-group">
+            {{ form.atext3.label(class="form-control-label") }}
+            {{ form.atext3(class="form-control-lg") }}
+      </div>
+      <div class="form-group">
+            {{ form.apic3.label() }}
+            {{ form.apic3(class="form-control-file") }}
+            {% if form.apic3.errors %}
+              {% for error in form.apic3.errors %}
+                  <span class="text-danger">{{ error }}</span></br>
+              {% endfor %}
+            {% endif %}
+      </div>
+      <div class="form-check">
+            {{ form.correct3(class="form-check-input") }}
+            {{ form.correct3.label(class="form-check-label") }}
+      </div>
+    </fieldset>
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add Answers</legend>
+      <div class="form-group">
+            {{ form.atext4.label(class="form-control-label") }}
+            {{ form.atext4(class="form-control-lg") }}
+      </div>
+      <div class="form-group">
+            {{ form.apic4.label() }}
+            {{ form.apic4(class="form-control-file") }}
+            {% if form.apic4.errors %}
+              {% for error in form.apic4.errors %}
+                  <span class="text-danger">{{ error }}</span></br>
+              {% endfor %}
+            {% endif %}
+      </div>
+      <div class="form-check">
+            {{ form.correct4(class="form-check-input") }}
+            {{ form.correct4.label(class="form-check-label") }}
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+    <div class="">
+      <a href="{{ url_for('addquiz') }}"><button type="button" name="endquiz">End Quiz</button></a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
