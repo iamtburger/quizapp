@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.widgets import TextArea
 
 
 class NewQuiz(FlaskForm):
@@ -10,6 +11,15 @@ class NewQuiz(FlaskForm):
 
     quiztitle = StringField('Quiz Title',
                             validators=[DataRequired(), Length(min=2, max=60)])
+
+    result1 = TextAreaField('Text to show for lowest 40%',
+                        validators=[DataRequired()], widget=TextArea())
+
+    result2 = TextAreaField('Text to show between 41-70%',
+                        validators=[DataRequired()], widget=TextArea())
+
+    result3 = TextAreaField('Text to show above 71%',
+                        validators=[DataRequired()], widget=TextArea())
 
     submit = SubmitField('Create Quiz')
 

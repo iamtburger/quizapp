@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% for question in quiz.questions %}
+    <h2>{{ question.qtext }}</h2>
+    {% if question.qpic %}
+        <img src="{{ url_for('static', filename='images/' + question.qpic) }}" alt="question image">
+    {% endif %}
+    {% for answer in question.answers %}
+        <p>{{ answer.atext }}</p>
+    {% endfor %}
+{% endfor %}
+
+{% endblock content%}

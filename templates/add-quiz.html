@@ -15,6 +15,21 @@
               {{ form.quiztitle(class="form-control-lg") }}
         </div>
       </fieldset>
+      <fieldset>
+      <div class="form-group">
+        {{ form.result1.label(class="form-control-label")}}
+        {{ form.result1(class="form-control-label")}}
+      </div>
+      <div class="form-group">
+        {{ form.result2.label(class="form-control-label")}}
+        {{ form.result2(class="form-control-label")}}
+      </div>
+      <div class="form-group">
+        {{ form.result3.label(class="form-control-label")}}
+        {{ form.result3(class="form-control-label")}}
+      </div>
+
+      </fieldset>
       <div class="form-group">
         {{ form.submit(class="btn btn-outline-info") }}
       </div>
