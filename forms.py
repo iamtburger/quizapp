@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms.widgets import TextArea
 
@@ -57,3 +57,12 @@ class NewQuestion(FlaskForm):
     correct4 = BooleanField('Is this answer correct?')
 
     submit = SubmitField('Add Question')
+
+class QuizDone(FlaskForm):
+    request_id = HiddenField()
+    option_id = HiddenField()
+
+    option = BooleanField()
+
+
+    submit = SubmitField('Finish Quiz')

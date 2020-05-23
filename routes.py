@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, session
 from quizapp import app, db
-from quizapp.forms import NewQuiz, NewQuestion
+from quizapp.forms import NewQuiz, NewQuestion, QuizDone
 from quizapp.models import Quiz, Question, Answer, Result
 from werkzeug.utils import secure_filename
 import os
@@ -15,15 +15,41 @@ def login():
     return render_template('login.html')
 
 #do a dynamic url for the quiz questions?
-@app.route('/quiz/<quiz_link>')
+@app.route('/quiz/<quiz_link>', methods=["GET", "POST"])
 def quiz(quiz_link):
     quiz = Quiz.query.get_or_404(quiz_link)
-    return render_template('quiz.html', name=quiz.quizname, quiz=quiz)
+    question = Question.query.filter_by(quiz_id=quiz_link).first()
+
+
+    return render_template('quiz.html', quiz=quiz, question=question)
+
+@app.route('/quiz/<quiz_link>/<question_link>', methods=["GET", "POST"])
+def question(quiz_link, question_link):
+        form = QuizDone()
+        quiz = Quiz.query.get_or_404(quiz_link)
+        question = Question.query.get_or_404(question_link)
+        questions = Question.query.filter_by(quiz_id=quiz_link)
+        question = Question.query.filter_by(id=question_link)
+
+        if request.method == "POST":
+            for q in questions:
+                session[question_link] = q.id
+
+                return redirect(url_for('question', quiz_link=quiz_link, question_link=question_link))
+
+        else:
+
+            return render_template('question.html', quiz=quiz, question=question, form=form)
+
+@app.route('/result')
+def result():
+
+    return render_template('result.html')
 
 def save_picture(form_picture):
     image = form_picture
     image_filename = secure_filename(image.filename)
-    image.save(os.path.join(app.root_path, 'images', image_filename))
+    image.save(os.path.join(app.root_path, 'static/images', image_filename))
 
     return image_filename
 

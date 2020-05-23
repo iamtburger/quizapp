@@ -3,7 +3,7 @@
 {% block content %}
     <ul>
       {% for q in quiz %}
-        <li><a href="{{ url_for('quiz', quiz_link=q.id) }}">{{ q.quizname }}</a></li>
+        <li><a href="{{ url_for('quiz', quiz_link=q.id, question_link=1) }}">{{ q.quizname }}</a></li>
       {% endfor %}
     </ul>
 {% endblock content %}
