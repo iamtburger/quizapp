@@ -11,12 +11,11 @@ class Question(db.Model):
     qtext = db.Column(db.String(120), unique=False, nullable=True)
     qpic = db.Column(db.String(20), unique=False, nullable=True)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-    answers = db.relationship('Answer', backref='answ', lazy=True)
+    options = db.relationship('Option', backref='opt', lazy=True)
 
-class Answer(db.Model):
+class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     atext = db.Column(db.String(120), unique=False, nullable=True)
-    apic = db.Column(db.String(20), unique=False, nullable=True)
     correct = db.Column(db.String(3), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
 

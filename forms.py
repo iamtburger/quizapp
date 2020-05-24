@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, HiddenField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, HiddenField, FieldList, FormField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms.widgets import TextArea
 
@@ -34,35 +34,34 @@ class NewQuestion(FlaskForm):
 
     qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
 
-    atext1 = StringField('Answer 1 Text',
+    atext1 = StringField('Option 1 Text',
                         validators=[DataRequired(), Length(min=5, max=120)])
-    apic1 = FileField('Image for answer 1')
-    correct1 = BooleanField('Is this answer correct?')
+    apic1 = FileField('Image for option 1')
+    correct1 = BooleanField('Is this option correct?')
 
-    atext2 = StringField('Answer 2 Text',
+    atext2 = StringField('Option 2 Text',
                         validators=[DataRequired(), Length(min=5, max=120)])
-    apic2 = FileField('Image for answer 2')
-    correct2 = BooleanField('Is this answer correct?')
+    apic2 = FileField('Image for option 2')
+    correct2 = BooleanField('Is this option correct?')
 
 
-    atext3 = StringField('Answer 3 Text',
+    atext3 = StringField('Option 3 Text',
                         validators=[Length(min=5, max=120)])
-    apic3 = FileField('Image for answer 3')
-    correct3 = BooleanField('Is this answer correct?')
+    apic3 = FileField('Image for option 3')
+    correct3 = BooleanField('Is this option correct?')
 
 
-    atext4 = StringField('Answer 4 Text',
+    atext4 = StringField('Option 4 Text',
                         validators=[Length(min=5, max=120)])
-    apic4 = FileField('Image for answer 4')
-    correct4 = BooleanField('Is this answer correct?')
+    apic4 = FileField('Image for option 4')
+    correct4 = BooleanField('Is this option correct?')
 
     submit = SubmitField('Add Question')
 
 class QuizDone(FlaskForm):
-    request_id = HiddenField()
-    option_id = HiddenField()
 
-    option = BooleanField()
-
+    question = HiddenField()
+    option = HiddenField()
+    selected = BooleanField()
 
     submit = SubmitField('Finish Quiz')

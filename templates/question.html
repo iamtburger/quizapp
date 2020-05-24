@@ -4,10 +4,20 @@
 
 <form class="" method="POST">
   {{ quiz.quizname }}
-  {{ question.qtext }}
-  <div class="form-group">
-    {{ form.submit(class="btn btn-outline-info") }}
+  <h2>{{ question.qtext }}</h2>
+  {% if question.qpic %}
+    <img src="{{ url_for('static', filename='images/' + question.qpic) }}" alt="">
+  {% endif %}
+
+  {% for option in options %}
+
+  <div class="btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-secondary">
+      <input type="checkbox" id="" value="{{ option.id }}" name="options"> {{ option.atext }}
+    </label>
   </div>
+  {% endfor %}
+<input type="submit">
 </form>
 
 

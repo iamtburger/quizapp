@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request, session
 from quizapp import app, db
 from quizapp.forms import NewQuiz, NewQuestion, QuizDone
-from quizapp.models import Quiz, Question, Answer, Result
+from quizapp.models import Quiz, Question, Option, Result
 from werkzeug.utils import secure_filename
 import os
 
@@ -18,8 +18,12 @@ def login():
 @app.route('/quiz/<quiz_link>', methods=["GET", "POST"])
 def quiz(quiz_link):
     quiz = Quiz.query.get_or_404(quiz_link)
-    question = Question.query.filter_by(quiz_id=quiz_link).first()
+    questions = Question.query.filter_by(quiz_id=quiz_link)
+    session['left'] = []
+    for q in questions:
+        session['left'].append(q.id)
 
+    question = session['left'][0]
 
     return render_template('quiz.html', quiz=quiz, question=question)
 
@@ -27,19 +31,32 @@ def quiz(quiz_link):
 def question(quiz_link, question_link):
         form = QuizDone()
         quiz = Quiz.query.get_or_404(quiz_link)
-        question = Question.query.get_or_404(question_link)
         questions = Question.query.filter_by(quiz_id=quiz_link)
-        question = Question.query.filter_by(id=question_link)
+        qall = session['left']
+        qleft = qall[0]
+        print(f'következő: {qleft}')
+        print(qall)
+
+        options = Option.query.filter_by(question_id=qleft).all()
+        question = Question.query.get(qleft)
+
 
         if request.method == "POST":
-            for q in questions:
-                session[question_link] = q.id
+            answer = request.form.getlist('options')
+            print(f"válasz id: {answer}")
 
-                return redirect(url_for('question', quiz_link=quiz_link, question_link=question_link))
+
+            qall.remove(question.id)
+            session['left'] = qall
+            print(question.id)
+            qleft = qall[0]
+
+
+            return redirect(url_for('question', quiz_link=quiz.id, question_link=qleft))
 
         else:
 
-            return render_template('question.html', quiz=quiz, question=question, form=form)
+            return render_template('question.html', quiz=quiz, question=question, options=options, form=form)
 
 @app.route('/result')
 def result():
@@ -74,17 +91,17 @@ def addquestion():
 
         q_id = question.id
 
-        allanswers = [[form.apic1.data, form.atext1.data, form.correct1.data], [form.apic2.data, form.atext2.data, form.correct2.data], [form.apic3.data, form.atext3.data, form.correct3.data], [form.apic4.data, form.atext4.data, form.correct4.data]]
-        for a, b, c in allanswers:
+        alloptions = [[form.apic1.data, form.atext1.data, form.correct1.data], [form.apic2.data, form.atext2.data, form.correct2.data], [form.apic3.data, form.atext3.data, form.correct3.data], [form.apic4.data, form.atext4.data, form.correct4.data]]
+        for a, b, c in alloptions:
 
             if a:
                 aimage = save_picture(a)
-                answer = Answer(atext=b, apic=aimage, correct=c, question_id=q_id)
-                db.session.add(answer)
+                option = Option(atext=b, apic=aimage, correct=c, question_id=q_id)
+                db.session.add(option)
                 db.session.commit()
             else:
-                answer = Answer(atext=b, correct=c, question_id=q_id)
-                db.session.add(answer)
+                option = Option(atext=b, correct=c, question_id=q_id)
+                db.session.add(option)
                 db.session.commit()
 
 
