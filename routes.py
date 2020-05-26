@@ -20,12 +20,30 @@ def quiz(quiz_link):
     quiz = Quiz.query.get_or_404(quiz_link)
     questions = Question.query.filter_by(quiz_id=quiz_link)
     session['left'] = []
+    session['answers'] = []
+    session['got_it_rigth'] = []
     for q in questions:
         session['left'].append(q.id)
 
     question = session['left'][0]
 
     return render_template('quiz.html', quiz=quiz, question=question)
+
+def checker(question_id, user_answer):
+    correct_answers = Option.query.filter_by(question_id=question_id).filter_by(correct=True).all()
+    print(correct_answers)
+    got_it_rigth = []
+    for correct in correct_answers:
+        for answer in user_answer:
+            print(type(correct.id))
+            print(type(answer))
+            if int(answer) == correct.id:
+                print(correct.id)
+                got_it_rigth.append(correct.id)
+                print("jó válasz")
+    print(got_it_rigth)
+    return got_it_rigth
+
 
 @app.route('/quiz/<quiz_link>/<question_link>', methods=["GET", "POST"])
 def question(quiz_link, question_link):
@@ -36,23 +54,38 @@ def question(quiz_link, question_link):
         qleft = qall[0]
         print(f'következő: {qleft}')
         print(qall)
+        answers = session['answers']
+        right_answers = session['got_it_rigth']
 
         options = Option.query.filter_by(question_id=qleft).all()
         question = Question.query.get(qleft)
 
 
         if request.method == "POST":
+
             answer = request.form.getlist('options')
             print(f"válasz id: {answer}")
+            answers.append(answer)
+            session['answers'] = answers
+            print(f"megválaszolva: {answers}")
+
+            result = checker(qleft, answer)
+            if result:
+                right_answers.append(result)
+                session['got_it_rigth'] = right_answers
+                print(f"ezek jók: {right_answers}")
 
 
-            qall.remove(question.id)
-            session['left'] = qall
-            print(question.id)
-            qleft = qall[0]
+            if len(qall) == 1:
+                return redirect(url_for('index')) #add final URL for the end of quiz
+            else:
+                qall.remove(question.id)
+                session['left'] = qall
+                print(question.id)
+                qleft = qall[0]
+                print(f"ennyi kérdés van hátra: {qall}")
 
-
-            return redirect(url_for('question', quiz_link=quiz.id, question_link=qleft))
+                return redirect(url_for('question', quiz_link=quiz.id, question_link=qleft))
 
         else:
 
