@@ -21,7 +21,7 @@ def quiz(quiz_link):
     questions = Question.query.filter_by(quiz_id=quiz_link)
     session['left'] = []
     session['answers'] = []
-    session['got_it_rigth'] = []
+    session['got_it_right'] = []
     for q in questions:
         session['left'].append(q.id)
 
@@ -32,17 +32,17 @@ def quiz(quiz_link):
 def checker(question_id, user_answer):
     correct_answers = Option.query.filter_by(question_id=question_id).filter_by(correct=True).all()
     print(correct_answers)
-    got_it_rigth = []
+    got_it_right = []
     for correct in correct_answers:
         for answer in user_answer:
             print(type(correct.id))
             print(type(answer))
             if int(answer) == correct.id:
                 print(correct.id)
-                got_it_rigth.append(correct.id)
+                got_it_right.append(correct.id)
                 print("jó válasz")
-    print(got_it_rigth)
-    return got_it_rigth
+    print(got_it_right)
+    return got_it_right
 
 
 @app.route('/quiz/<quiz_link>/<question_link>', methods=["GET", "POST"])
@@ -55,7 +55,7 @@ def question(quiz_link, question_link):
         print(f'következő: {qleft}')
         print(qall)
         answers = session['answers']
-        right_answers = session['got_it_rigth']
+        right_answers = session['got_it_right']
 
         options = Option.query.filter_by(question_id=qleft).all()
         question = Question.query.get(qleft)
@@ -72,12 +72,12 @@ def question(quiz_link, question_link):
             result = checker(qleft, answer)
             if result:
                 right_answers.append(result)
-                session['got_it_rigth'] = right_answers
+                session['got_it_right'] = right_answers
                 print(f"ezek jók: {right_answers}")
 
 
             if len(qall) == 1:
-                return redirect(url_for('index')) #add final URL for the end of quiz
+                return redirect(url_for('result', quiz_id=quiz.id)) #add final URL for the end of quiz
             else:
                 qall.remove(question.id)
                 session['left'] = qall
@@ -93,8 +93,22 @@ def question(quiz_link, question_link):
 
 @app.route('/result')
 def result():
+    quiz_id = 2
+    got_it_right = session['got_it_right']
+    correct_answers = Question.query.filter_by(quiz_id=quiz_id).count()
+    messages = Result.query.filter_by(quiz_id=quiz_id).all()
+    print(f"this is the message: {messages}")
+    print(len(got_it_right))
+    print(correct_answers)
+    result = round((len(got_it_right) / correct_answers) * 100, 2)
+    print(result)
+    message_to_show = None
+    for message in messages:
+        if result <= message.range_max and result >= message.range_min:
+            message_to_show = message.result
+            print(message_to_show)
 
-    return render_template('result.html')
+    return render_template('result.html', result=result, message=message_to_show)
 
 def save_picture(form_picture):
     image = form_picture
