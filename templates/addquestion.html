@@ -1,14 +1,23 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="content-section">
+<div class="container">
   <form class="" method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <fieldset class="form-group">
       <legend class="border-bottom mb-4">Create New Question</legend>
       <div class="form-group">
             {{ form.qtext.label(class="form-control-label") }}
-            {{ form.qtext(class="form-control-lg") }}
+            {% if form.qtext.errors %}
+              {{ form.qtext(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.qtext.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+            {{ form.qtext(class="form-control") }}
+            {% endif %}
       </div>
       <div class="form-group">
             {{ form.qpic.label() }}
@@ -21,56 +30,73 @@
       </div>
     </fieldset>
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Add Options</legend>
       <div class="form-group">
             {{ form.atext1.label(class="form-control-label") }}
-            {{ form.atext1(class="form-control-lg") }}
+            {% if form.atext1.errors %}
+              {{ form.atext1(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                {% for error in form.atex1.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.atext1(class="form-control") }}
+            {% endif %}
       </div>
-          <div class="form-check">
-            {{ form.correct1(class="form-check-input", type="radio") }}
+          <div class="form-check" style="display: none">
+            {{ form.correct1(class="form-check-input", type="radio", checked=True) }}
             {{ form.correct1.label(class="form-check-label") }}
-      </div>
+          </div>
     </fieldset>
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Add Options</legend>
       <div class="form-group">
             {{ form.atext2.label(class="form-control-label") }}
-            {{ form.atext2(class="form-control-lg") }}
-      </div>
-            <div class="form-check">
-            {{ form.correct2(class="form-check-input") }}
-            {{ form.correct2.label(class="form-check-label") }}
-      </div>
+            {% if form.atext2.errors %}
+              {{ form.atext2(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                {% for error in form.atext2.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.atext2(class="form-control") }}
+              {% endif %}
     </fieldset>
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Add Options</legend>
       <div class="form-group">
             {{ form.atext3.label(class="form-control-label") }}
-            {{ form.atext3(class="form-control-lg") }}
-      </div>
-            <div class="form-check">
-            {{ form.correct3(class="form-check-input") }}
-            {{ form.correct3.label(class="form-check-label") }}
-      </div>
+            {% if form.atext3.errors %}
+              {{ form.atext3(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                {% for error in form.atext3.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.atext3(class="form-control") }}
+              {% endif %}
     </fieldset>
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Add Options</legend>
       <div class="form-group">
             {{ form.atext4.label(class="form-control-label") }}
-            {{ form.atext4(class="form-control-lg") }}
-      </div>
-            <div class="form-check">
-            {{ form.correct4(class="form-check-input") }}
-            {{ form.correct4.label(class="form-check-label") }}
-      </div>
+            {% if form.atext4.errors %}
+              {{ form.atext4(class="form-control form-control-lg is-invalid")}}
+              <div class="invalid-feedback">
+                {% for error in form.atext4.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% else %}
+              {{ form.atext4(class="form-control") }}
+              {% endif %}
     </fieldset>
     <div class="form-group">
-      {{ form.submit(class="btn btn-outline-info") }}
-    </div>
-    <div class="">
-      <a href="{{ url_for('addquiz') }}"><button type="button" name="endquiz">End Quiz</button></a>
+      {{ form.submit(class="btn btn-light btn-lg btn-block") }}
     </div>
   </form>
+  <div class="mt-5">
+    <a href="{{ url_for('addquiz') }}"><button type="button" name="endquiz" class="btn btn-dark">End Quiz</button></a>
+  </div>
 </div>
 
 {% endblock %}

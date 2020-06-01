@@ -1,0 +1,10 @@
+.vl {
+  border-left: 6px solid green;
+  height: 500px;
+}
+
+@media (min-width: 600px) {
+    .container{
+        max-width: 500px;
+    }
+}

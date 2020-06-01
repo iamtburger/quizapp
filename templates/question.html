@@ -1,24 +1,28 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<div class="container">
+<div class="justify-content-center">
 
 <form class="" method="POST">
-  {{ quiz.quizname }}
-  <h2>{{ question.qtext }}</h2>
+  <small>{{ quiz.quizname }}</small>
+  <h2 class="border-bottom mb-4 text-center">{{ question.qtext }}</h2>
   {% if question.qpic %}
-    <img src="{{ url_for('static', filename='images/' + question.qpic) }}" alt="">
+    <img src="{{ url_for('static', filename='images/' + question.qpic) }}" alt="" class="mb-3 rounded mx-auto d-block img-fluid">
   {% endif %}
 
   {% for option in options %}
 
-  <div class="btn-group-toggle" data-toggle="buttons">
-    <label class="btn btn-secondary">
-      <input type="checkbox" id="" value="{{ option.id }}" name="options"> {{ option.atext }}
+  <div class="btn-group-toggle btn-block mb-3" data-toggle="buttons">
+    <label class="btn btn-secondary btn-block">
+      <input type="checkbox" id="" value="{{ option.id }}" name="options" class=""> {{ option.atext }}
     </label>
   </div>
   {% endfor %}
-<input type="submit">
-</form>
 
+<input type="submit" class="btn btn-light btn-lg btn-block">
+</form>
+</div>
+</div>
 
 {% endblock content%}

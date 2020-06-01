@@ -1,38 +1,85 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-  <div class="content-section">
+<div class="container">
+    <div class="justify-content-center">
     <form class="" method="POST">
       {{ form.hidden_tag() }}
-      <fieldset class="form-group">
-        <legend class="border-bottom mb-4">Create New Quiz</legend>
+
+      <fieldset class="">
+        <legend class="border-bottom mb-4 text-center">Create New Quiz</legend>
         <div class="form-group">
-              {{ form.quizname.label(class="form-control-label") }}
-              {{ form.quizname(class="form-control-lg") }}
+              {{ form.quizname.label(class="") }}
+              {% if form.quizname.errors %}
+                {{ form.quizname(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.quizname.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+                {% else %}
+                {{ form.quizname(class="form-control") }}
+                {% endif %}
         </div>
         <div class="form-group">
               {{ form.quiztitle.label(class="form-control-label") }}
-              {{ form.quiztitle(class="form-control-lg") }}
+              {% if form.quiztitle.errors %}
+                {{ form.quiztitle(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                  {% for error in form.quizname.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+                {% else %}
+                  {{ form.quiztitle(class="form-control") }}
+                {% endif %}
         </div>
-      </fieldset>
-      <fieldset>
       <div class="form-group">
         {{ form.result1.label(class="form-control-label")}}
-        {{ form.result1(class="form-control-label")}}
+        {% if form.result1.errors %}
+        {{ form.result1(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.quizname.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        {{ form.result1(class="form-control")}}
+        {% endif %}
       </div>
       <div class="form-group">
         {{ form.result2.label(class="form-control-label")}}
-        {{ form.result2(class="form-control-label")}}
+        {% if form.result2.errors %}
+        {{ form.result2(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.result2.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        {{ form.result2(class="form-control")}}
+        {% endif %}
       </div>
       <div class="form-group">
         {{ form.result3.label(class="form-control-label")}}
-        {{ form.result3(class="form-control-label")}}
+        {% if form.result3.errors %}
+        {{ form.result3(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.result3.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+          {{ form.result3(class="form-control")}}
+        {% endif %}
+      </div>
+      </fieldset>
+
+      <div class="form-group">
+        {{ form.submit(class="btn btn-light btn-lg btn-block") }}
       </div>
 
-      </fieldset>
-      <div class="form-group">
-        {{ form.submit(class="btn btn-outline-info") }}
-      </div>
     </form>
   </div>
+</div>
 {% endblock %}

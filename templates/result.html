@@ -1,6 +1,12 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h4>You got {{ result }}% right!</h4>
-  <p>{{ message }}</p>
+
+<div class="container mt-5 border">
+  <div class="justify-content-center">
+    <h4 class="text-center mb-5">You got {{ result }}% right!</h4>
+    <p>{{ message }}</p>
+  </div>
+</div>
+
 {% endblock content %}

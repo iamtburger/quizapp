@@ -1,21 +1,52 @@
 from flask import render_template, url_for, flash, redirect, request, session
-from quizapp import app, db
-from quizapp.forms import NewQuiz, NewQuestion, QuizDone
-from quizapp.models import Quiz, Question, Option, Result
+from quizapp import app, db, bcrypt
+from quizapp.forms import NewQuiz, NewQuestion, QuizDone, RegisterForm, LoginForm
+from quizapp.models import Quiz, Question, Option, Result, User
 from werkzeug.utils import secure_filename
 import os
+
+from PIL import Image
+from datetime import datetime
+from flask_login import login_user
+from sqlalchemy import func
+
 
 @app.route('/')
 def index():
     quiz = Quiz.query.all()
     return render_template('index.html', quiz=quiz)
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid email or password!')
+
+    return render_template('login.html', form=form)
+
+@app.route('/register', methods=["GET", "POST"])
+def register():
+
+    form = RegisterForm()
+    if form.validate_on_submit():
+
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(email=form.email.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        flash('The account has been created. You can login now!', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html', form=form)
 
 #do a dynamic url for the quiz questions?
-@app.route('/quiz/<quiz_link>', methods=["GET", "POST"])
+@app.route('/quiz/<quiz_link>')
 def quiz(quiz_link):
     quiz = Quiz.query.get_or_404(quiz_link)
     questions = Question.query.filter_by(quiz_id=quiz_link)
@@ -57,7 +88,7 @@ def question(quiz_link, question_link):
         answers = session['answers']
         right_answers = session['got_it_right']
 
-        options = Option.query.filter_by(question_id=qleft).all()
+        options = Option.query.filter_by(question_id=qleft).order_by(func.random()).all()
         question = Question.query.get(qleft)
 
 
@@ -77,7 +108,8 @@ def question(quiz_link, question_link):
 
 
             if len(qall) == 1:
-                return redirect(url_for('result', quiz_id=quiz.id)) #add final URL for the end of quiz
+
+                return redirect(url_for('result', quiz_id=quiz.id))
             else:
                 qall.remove(question.id)
                 session['left'] = qall
@@ -93,7 +125,7 @@ def question(quiz_link, question_link):
 
 @app.route('/result')
 def result():
-    quiz_id = 2
+    quiz_id = request.args.get('quiz_id')
     got_it_right = session['got_it_right']
     correct_answers = Question.query.filter_by(quiz_id=quiz_id).count()
     messages = Result.query.filter_by(quiz_id=quiz_id).all()
@@ -113,7 +145,12 @@ def result():
 def save_picture(form_picture):
     image = form_picture
     image_filename = secure_filename(image.filename)
-    image.save(os.path.join(app.root_path, 'static/images', image_filename))
+    image_path = os.path.join(app.root_path, 'static/images', image_filename)
+
+    output_size = (640, 500)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(image_path)
 
     return image_filename
 
@@ -124,7 +161,7 @@ def addquestion():
     #javítani a quiz id részt, melyik legyen a primary key???
     quizid = session['q_id']
 
-    if request.method == "POST":
+    if form.validate_on_submit():
 
         if form.qpic.data:
             qimage = save_picture(form.qpic.data)
@@ -138,18 +175,11 @@ def addquestion():
 
         q_id = question.id
 
-        alloptions = [[form.apic1.data, form.atext1.data, form.correct1.data], [form.apic2.data, form.atext2.data, form.correct2.data], [form.apic3.data, form.atext3.data, form.correct3.data], [form.apic4.data, form.atext4.data, form.correct4.data]]
-        for a, b, c in alloptions:
-
-            if a:
-                aimage = save_picture(a)
-                option = Option(atext=b, apic=aimage, correct=c, question_id=q_id)
-                db.session.add(option)
-                db.session.commit()
-            else:
-                option = Option(atext=b, correct=c, question_id=q_id)
-                db.session.add(option)
-                db.session.commit()
+        alloptions = [[form.atext1.data, form.correct1.data], [form.atext2.data, form.correct2.data], [form.atext3.data, form.correct3.data], [form.atext4.data, form.correct4.data]]
+        for b, c in alloptions:
+            option = Option(atext=b, correct=c, question_id=q_id)
+            db.session.add(option)
+            db.session.commit()
 
 
         flash('Question has been added!', 'success')
@@ -158,16 +188,15 @@ def addquestion():
 
         return redirect(url_for('addquestion', quizid=quizid))
 
-    else:
-        return render_template('addquestion.html', form=form)
+    return render_template('addquestion.html', form=form)
 
 @app.route('/add-quiz', methods=["GET", "POST"])
 def addquiz():
     form = NewQuiz()
 
-    if request.method == "POST":
+    if form.validate_on_submit():
 
-        quiz = Quiz(quizname=form.quizname.data, quiztitle=form.quiztitle.data)
+        quiz = Quiz(quizname=form.quizname.data, quiztitle=form.quiztitle.data, date=datetime.today(), user_id='1')
 
         db.session.add(quiz)
         db.session.commit()
@@ -186,5 +215,4 @@ def addquiz():
 
         return redirect(url_for('addquestion', quizid=session['q_id']))
 
-    else:
-        return render_template('add-quiz.html', form=form)
+    return render_template('add-quiz.html', form=form)

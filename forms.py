@@ -37,7 +37,7 @@ class NewQuestion(FlaskForm):
     atext1 = StringField('Option 1 Text',
                         validators=[DataRequired(), Length(min=5, max=120)])
     apic1 = FileField('Image for option 1')
-    correct1 = BooleanField('Is this option correct?')
+    correct1 = BooleanField('Correct Answer!')
 
     atext2 = StringField('Option 2 Text',
                         validators=[DataRequired(), Length(min=5, max=120)])
@@ -65,3 +65,25 @@ class QuizDone(FlaskForm):
     selected = BooleanField()
 
     submit = SubmitField('Finish Quiz')
+
+class RegisterForm(FlaskForm):
+
+    email = StringField('User Email',
+                        validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+
+    submit = SubmitField('Register')
+
+    def check_user(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('Email is already registered.')
+
+class LoginForm(FlaskForm):
+
+    email = StringField('User Email',
+                        validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+
+    submit = SubmitField('Login')
