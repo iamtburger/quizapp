@@ -34,7 +34,7 @@ class NewQuestion(FlaskForm):
 
     qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
 
-    atext1 = StringField('Option 1 Text',
+    atext1 = StringField('Correct Answer',
                         validators=[DataRequired(), Length(min=5, max=120)])
     apic1 = FileField('Image for option 1')
     correct1 = BooleanField('Correct Answer!')
@@ -57,6 +57,32 @@ class NewQuestion(FlaskForm):
     correct4 = BooleanField('Is this option correct?')
 
     submit = SubmitField('Add Question')
+
+class NewUpdate(FlaskForm):
+    qtext = StringField('Question Text',
+                        validators=[Length(min=5, max=120)])
+
+    qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
+
+    atext1 = StringField('Correct Answer',
+                        validators=[DataRequired(), Length(min=5, max=120)])
+    correct1 = BooleanField('Correct Answer!')
+
+    atext2 = StringField('Option 2 Text',
+                        validators=[DataRequired(), Length(min=5, max=120)])
+    correct2 = BooleanField('Is this option correct?')
+
+
+    atext3 = StringField('Option 3 Text',
+                        validators=[Length(min=5, max=120)])
+    correct3 = BooleanField('Is this option correct?')
+
+
+    atext4 = StringField('Option 4 Text',
+                        validators=[Length(min=5, max=120)])
+    correct4 = BooleanField('Is this option correct?')
+
+    submit = SubmitField('Update Question')
 
 class QuizDone(FlaskForm):
 

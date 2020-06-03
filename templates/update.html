@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+<legend>Update Question</legend>
+<form class="form-group" method="post">
+  {{ form.hidden_tag() }}
+  <div class="form-group">
+  {{ form.qtext.label(class="form-control-label") }}
+  {% if form.qtext.errors %}
+    {{ form.qtext(class="form-control form-control-lg is-invalid") }}
+    <div class="invalid-feedback">
+      {% for error in form.qtext.errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ form.qtext(class="form-control") }}
+  {% endif %}
+  </div>
+  <div class="form-group">
+  {{ form.atext1.label(class="form-control-label") }}
+  {% if form.atext1.errors %}
+    {{ form.atext1(class="form-control form-control-lg is-invalid") }}
+    <div class="invalid-feedback">
+      {% for error in form.atext1.errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ form.atext1(class="form-control") }}
+  {% endif %}
+  </div>
+  <div class="form-group">
+  {{ form.atext2.label(class="form-control-label") }}
+  {% if form.atext2.errors %}
+    {{ form.atext2(class="form-control form-control-lg is-invalid") }}
+    <div class="invalid-feedback">
+      {% for error in form.atext2.errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ form.atext2(class="form-control") }}
+  {% endif %}
+  </div>
+  <div class="form-group">
+  {% if form.atext3 %}
+  {{ form.atext3.label(class="form-control-label") }}
+  {% if form.atext3.errors %}
+    {{ form.atext3(class="form-control form-control-lg is-invalid") }}
+    <div class="invalid-feedback">
+      {% for error in form.atext3.errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ form.atext3(class="form-control") }}
+  {% endif %}
+  {% endif %}
+  </div>
+  <div class="form-group">
+  {% if form.atext4 %}
+  {{ form.atext4.label(class="form-control-label") }}
+  {% if form.atext4.errors %}
+    {{ form.atext4(class="form-control form-control-lg is-invalid") }}
+    <div class="invalid-feedback">
+      {% for error in form.atext4.errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ form.atext4(class="form-control") }}
+  {% endif %}
+  {% endif %}
+  </div>
+  <div class="form-group">
+    {{ form.submit(class="btn btn-light btn-lg btn-block") }}
+  </div>
+</form>
+
+</div>
+{% endblock %}

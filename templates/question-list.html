@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Question Name</th>
+      <th scope="col">Edit</th>
+      <th scope="col">Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for question in question_list %}
+    <tr>
+      <td>{{ question.qtext }}</td>
+      <td><a href="{{ url_for('update', quiz_link=question.quiz_id, question_link=question.id) }}" class="btn btn-primary" role="button">EDIT</a></td>
+      <td><form method="post" action="{{ url_for('deletequestion', quiz_link=question.quiz_id, question_link=question.id) }}">
+        <button type="submit" name="button"class="btn btn-danger" value="Delete" role="button">DELETE</button>
+      </form></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+    </table>
+
+
+
+{% endblock %}

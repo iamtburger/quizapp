@@ -134,3 +134,23 @@ class Login(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
     submit = SubmitField('Login')
+
+
+
+@app.route('/<quiz_link>/update/<question_link>')
+def update(quiz_link, question_link):
+    form = NewQuestion()
+
+    question = Question.query.filter_by(quiz_id=quiz_link).all()
+    option_list = Options.query.filter_by(question_id=question_link).all()
+
+    form.qtext.data = question.qtext
+    form.atext1.data = option_list[0].atext #el lehet érni egy adott elemét a listá
+    return render_template('update', option_list=option_list, question=question)
+
+
+@app.route('/<quiz_link>/question-list')
+def questionlist(quiz_link):
+
+    question_list = Question.query.filter_by(quiz_id=quiz_link).all()
+    return render_template('question-list.html', question_list=question_list)

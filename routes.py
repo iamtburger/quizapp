@@ -1,17 +1,18 @@
-from flask import render_template, url_for, flash, redirect, request, session
+from flask import render_template, url_for, flash, redirect, request, session, abort
 from quizapp import app, db, bcrypt
-from quizapp.forms import NewQuiz, NewQuestion, QuizDone, RegisterForm, LoginForm
+from quizapp.forms import NewQuiz, NewQuestion, QuizDone, RegisterForm, LoginForm, NewUpdate
 from quizapp.models import Quiz, Question, Option, Result, User
 from werkzeug.utils import secure_filename
 import os
 
 from PIL import Image
 from datetime import datetime
-from flask_login import login_user
+from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import func
 
 
 @app.route('/')
+@login_required
 def index():
     quiz = Quiz.query.all()
     return render_template('index.html', quiz=quiz)
@@ -19,7 +20,8 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
@@ -30,9 +32,16 @@ def login():
 
     return render_template('login.html', form=form)
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 @app.route('/register', methods=["GET", "POST"])
 def register():
 
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     form = RegisterForm()
     if form.validate_on_submit():
 
@@ -159,7 +168,7 @@ def addquestion():
 
     form = NewQuestion()
     #javítani a quiz id részt, melyik legyen a primary key???
-    quizid = session['q_id']
+    quizid = request.args.get('quizid')
 
     if form.validate_on_submit():
 
@@ -201,7 +210,7 @@ def addquiz():
         db.session.add(quiz)
         db.session.commit()
 
-        session['q_id'] = quiz.id
+        quizid = quiz.id
 
         ranges = [[0, 40, form.result1.data], [41, 70, form.result2.data], [71, 100, form.result3.data]]
         for a, b, c in ranges:
@@ -213,6 +222,76 @@ def addquiz():
 
         flash('The quiz has been created. Now add a question!', 'success')
 
-        return redirect(url_for('addquestion', quizid=session['q_id']))
+        return redirect(url_for('addquestion', quizid=quizid))
 
     return render_template('add-quiz.html', form=form)
+
+@app.route('/<quiz_link>/question-list')
+def questionlist(quiz_link):
+
+    question_list = Question.query.filter_by(quiz_id=quiz_link).all()
+    return render_template('question-list.html', question_list=question_list)
+
+@app.route('/<quiz_link>/update/<question_link>', methods=['GET', 'POST'])
+def update(quiz_link, question_link):
+    question = Question.query.filter_by(quiz_id=quiz_link).first()
+    quiz = Quiz.query.filter_by(id=quiz_link).first()
+    option_list = Option.query.filter_by(question_id=question_link).all()
+    if current_user.id != quiz.user_id:
+
+        abort(403)
+
+    form = NewUpdate()
+    if form.validate_on_submit():
+
+        question.qtext = form.qtext.data
+        option_list[0].atext = form.atext1.data
+        option_list[1].atext = form.atext2.data
+        option_list[2].atext = form.atext3.data
+        option_list[3].atext = form.atext4.data
+        db.session.commit()
+        flash('The Question has been updated', 'success')
+        return redirect(url_for('questionlist', quiz_link=quiz_link))
+
+    elif request.method == 'GET':
+        form.qtext.data = question.qtext
+        form.atext1.data = option_list[0].atext
+        form.atext2.data = option_list[1].atext
+        form.atext3.data = option_list[2].atext
+        form.atext4.data = option_list[3].atext
+    return render_template('update.html', option_list=option_list, question=question, form=form)
+
+@app.route('/<quiz_link>/delete-quiz', methods=['POST'])
+def deletequiz(quiz_link):
+    quiz = Quiz.query.filter_by(id=quiz_link).first()
+    questions = Question.query.filter_by(quiz_id=quiz_link).all()
+
+
+    if current_user.id != quiz.user_id:
+        abort(403)
+
+    for question in questions:
+        options = Option.query.filter_by(question_id=question.id).all()
+        for option in options:
+            db.session.delete(option)
+        db.session.delete(question)
+    db.session.delete(quiz)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/<quiz_link>/delete-question/<question_link>', methods=['POST'])
+def deletequestion(quiz_link, question_link):
+    quiz = Quiz.query.filter_by(id=quiz_link).first()
+    question = Question.query.get(question_link)
+
+    if current_user.id != quiz.user_id:
+        abort(403)
+
+
+    options = Option.query.filter_by(question_id=question.id).all()
+    for option in options:
+        db.session.delete(option)
+    db.session.delete(question)
+    db.session.commit()
+
+    return redirect(url_for('index'))

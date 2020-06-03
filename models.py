@@ -7,7 +7,7 @@ class Quiz(db.Model):
     quizname = db.Column(db.String(20), unique=True, nullable=False)
     quiztitle = db.Column(db.String(80), unique=False, nullable=False)
     questions = db.relationship('Question', backref='ques', lazy=True)
-    date = db.Column(db.String(120), nullable=False)
+    date = db.Column(db.DateTime(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
