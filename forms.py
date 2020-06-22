@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from wtforms.widgets import TextArea
 
 
-class NewQuiz(FlaskForm):
+class CreateQuiz(FlaskForm):
     quizname = StringField('Quiz Name',
                             validators=[DataRequired(), Length(min=2, max=30)])
 
@@ -28,7 +28,7 @@ class NewQuiz(FlaskForm):
         if quiz:
             raise ValidationError('The Quiz Name is taken. Please choose another one.')
 
-class NewQuestion(FlaskForm):
+class CreateQuestion(FlaskForm):
     qtext = StringField('Question Text',
                         validators=[Length(min=5, max=120)])
 
@@ -58,7 +58,7 @@ class NewQuestion(FlaskForm):
 
     submit = SubmitField('Add Question')
 
-class NewUpdate(FlaskForm):
+class UpdateQuestion(FlaskForm):
     qtext = StringField('Question Text',
                         validators=[Length(min=5, max=120)])
 
@@ -84,13 +84,13 @@ class NewUpdate(FlaskForm):
 
     submit = SubmitField('Update Question')
 
-class QuizDone(FlaskForm):
-
-    question = HiddenField()
-    option = HiddenField()
-    selected = BooleanField()
-
-    submit = SubmitField('Finish Quiz')
+# class QuizDone(FlaskForm):
+#
+#     question = HiddenField()
+#     option = HiddenField()
+#     selected = BooleanField()
+#
+#     submit = SubmitField('Finish Quiz')
 
 class RegisterForm(FlaskForm):
 
@@ -113,3 +113,14 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
     submit = SubmitField('Login')
+
+# class TestQuestion(FlaskForm):
+#     qtext = StringField('Question Text',
+#                         validators=[Length(min=5, max=120)])
+#
+#     qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
+#
+#     atext = StringField('Correct Answer',
+#                         validators=[DataRequired(), Length(min=5, max=120)])
+#     correct = BooleanField('Correct Answer!')
+#     submit = SubmitField('Update Question')

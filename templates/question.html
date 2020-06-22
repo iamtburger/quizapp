@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'layout-nonav.html' %}
 
 {% block content %}
 <div class="container">
@@ -10,17 +10,16 @@
   {% if question.qpic %}
     <img src="{{ url_for('static', filename='images/' + question.qpic) }}" alt="" class="mb-3 rounded mx-auto d-block img-fluid">
   {% endif %}
-
+  <div class="btn-group-toggle btn-block mb-3" data-toggle="buttons">
   {% for option in options %}
 
-  <div class="btn-group-toggle btn-block mb-3" data-toggle="buttons">
-    <label class="btn btn-secondary btn-block">
-      <input type="checkbox" id="" value="{{ option.id }}" name="options" class=""> {{ option.atext }}
+    <label class="btn btn-outline-secondary btn-block" for="{{ option.id }}">
+      <input type="radio" id="{{ option.id }}" value="{{ option.id }}" name="options" class=""> {{ option.atext }}
     </label>
-  </div>
-  {% endfor %}
 
-<input type="submit" class="btn btn-light btn-lg btn-block">
+  {% endfor %}
+  </div>
+<button type="submit" name="button" class="btn btn-light btn-lg btn-block">Submit</button>
 </form>
 </div>
 </div>

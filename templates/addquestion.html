@@ -3,9 +3,14 @@
 {% block content %}
 <div class="container">
   <form class="" method="POST" enctype="multipart/form-data">
+    <div class="">
+
+
     {{ form.hidden_tag() }}
     <fieldset class="form-group">
+
       <legend class="border-bottom mb-4">Create New Question</legend>
+
       <div class="form-group">
             {{ form.qtext.label(class="form-control-label") }}
             {% if form.qtext.errors %}
@@ -18,6 +23,7 @@
             {% else %}
             {{ form.qtext(class="form-control") }}
             {% endif %}
+
       </div>
       <div class="form-group">
             {{ form.qpic.label() }}
@@ -43,8 +49,8 @@
               {{ form.atext1(class="form-control") }}
             {% endif %}
       </div>
-          <div class="form-check" style="display: none">
-            {{ form.correct1(class="form-check-input", type="radio", checked=True) }}
+          <div class="form-check">
+            {{ form.correct1(class="form-check-input", type="radio") }}
             {{ form.correct1.label(class="form-check-label") }}
           </div>
     </fieldset>
@@ -61,6 +67,10 @@
               {% else %}
               {{ form.atext2(class="form-control") }}
               {% endif %}
+              <div class="form-check">
+              {{ form.correct2(class="form-check-input", type="radio") }}
+              {{ form.correct2.label(class="form-check-label") }}
+              </div>
     </fieldset>
     <fieldset class="form-group">
       <div class="form-group">
@@ -75,6 +85,10 @@
               {% else %}
               {{ form.atext3(class="form-control") }}
               {% endif %}
+              <div class="form-check">
+                {{ form.correct3(class="form-check-input", type="radio") }}
+                {{ form.correct3.label(class="form-check-label") }}
+              </div>
     </fieldset>
     <fieldset class="form-group">
       <div class="form-group">
@@ -89,10 +103,15 @@
               {% else %}
               {{ form.atext4(class="form-control") }}
               {% endif %}
+              <div class="form-check">
+                {{ form.correct4(class="form-check-input", type="radio") }}
+                {{ form.correct4.label(class="form-check-label") }}
+              </div>
     </fieldset>
     <div class="form-group">
       {{ form.submit(class="btn btn-light btn-lg btn-block") }}
     </div>
+  </div>
   </form>
   <div class="mt-5">
     <a href="{{ url_for('addquiz') }}"><button type="button" name="endquiz" class="btn btn-dark">End Quiz</button></a>
