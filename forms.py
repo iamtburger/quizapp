@@ -114,13 +114,26 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField('Login')
 
-# class TestQuestion(FlaskForm):
-#     qtext = StringField('Question Text',
-#                         validators=[Length(min=5, max=120)])
-#
-#     qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
-#
-#     atext = StringField('Correct Answer',
-#                         validators=[DataRequired(), Length(min=5, max=120)])
-#     correct = BooleanField('Correct Answer!')
-#     submit = SubmitField('Update Question')
+
+
+class TestQuestion(FlaskForm):
+    qtext = StringField('Question Text',
+                        validators=[Length(min=5, max=120)])
+
+    qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
+
+    atext = StringField('Answer',
+                        validators=[DataRequired(), Length(min=5, max=120)])
+    correct = BooleanField('Correct Answer!')
+    submit = SubmitField('Add Question')
+
+class NewOptionsForm(FlaskForm):
+    atext = StringField('Answer', validators=[DataRequired(), Length(min=5, max=120)])
+    correct = BooleanField('Correct Answer?')
+
+class NewQuestioForm(FlaskForm):
+    qtext = StringField('Question Text', validators=[Length(min=5, max=120)])
+
+    qpic = FileField('Image for question', validators=[FileAllowed(['jpg', 'png'])])
+    answers = FieldList(FormField(NewOptionsForm), min_entries=4)
+    submit = SubmitField('Add Question')

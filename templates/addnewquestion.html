@@ -1,12 +1,16 @@
-<!-- {% extends 'layout.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 <div class="container">
   <form class="" method="POST" enctype="multipart/form-data">
     <div class="">
+
+
     {{ form.hidden_tag() }}
     <fieldset class="form-group">
+
       <legend class="border-bottom mb-4">Create New Question</legend>
+
       <div class="form-group">
             {{ form.qtext.label(class="form-control-label") }}
             {% if form.qtext.errors %}
@@ -30,28 +34,29 @@
               {% endfor %}
             {% endif %}
       </div>
-      {% for option in range(4) %}
-      <fieldset class="form-group">
-        <div class="form-group">
-              {{ form.atext.label(class="form-control-label") }}
-              {% if form.atext.errors %}
-                {{ form.atext(class="form-control form-control-lg is-invalid")}}
+
+
+    </fieldset>
+      <div class="form-group">
+            {% for i in form.answers %}
+              {{ i.form.atext.label(class="form-control-label") }}
+              {% if i.form.atext.errors %}
+                {{ i.form.atext(class="form-control form-control-lg is-invalid")}}
                 <div class="invalid-feedback">
-                  {% for error in form.atext.errors %}
+                  {% for error in i.form.atext.errors %}
                   <span>{{ error }}</span>
                   {% endfor %}
                 </div>
               {% else %}
-                {{ form.atext(class="form-control") }}
+                {{ i.form.atext(class="form-control") }}
               {% endif %}
-        </div>
-            <div class="form-check">
-              {{ form.correct(class="form-check-input", type="radio") }}
-              {{ form.correct.label(class="form-check-label") }}
-            </div>
-      </fieldset>
-      {% endfor %}
-          <div class="form-group">
+              <div class="form-check" style="display: none">
+                {{ i.form.correct(class="form-check-input", type="radio", checked=False) }}
+                {{ i.form.correct.label(class="form-check-label") }}
+              </div>
+
+            {% endfor %}
+    <div class="form-group">
       {{ form.submit(class="btn btn-light btn-lg btn-block") }}
     </div>
   </div>
@@ -60,5 +65,4 @@
     <a href="{{ url_for('addquiz') }}"><button type="button" name="endquiz" class="btn btn-dark">End Quiz</button></a>
   </div>
 </div>
-
-{% endblock %} -->
+{% endblock %}

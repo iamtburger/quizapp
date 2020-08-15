@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, session, abort
 from quizapp import app, db, bcrypt
-from quizapp.forms import CreateQuiz, CreateQuestion, RegisterForm, LoginForm, UpdateQuestion
+from quizapp.forms import CreateQuiz, CreateQuestion, RegisterForm, LoginForm, UpdateQuestion, TestQuestion, NewOptionsForm, NewQuestioForm
 from quizapp.models import Quiz, Question, Option, Result, User
 from werkzeug.utils import secure_filename
 import os
@@ -68,8 +68,8 @@ def quiz(quiz_link):
     session['answers'] = []
     session['got_it_right'] = []
     session['correct_counter'] = 0
-    for q in questions:
-        session['questions_left'].append(q.id)
+
+    session['questions_left'] = [q.id for q in questions]
 
     question = session['questions_left'][0]
 
@@ -87,14 +87,14 @@ def checker(question_id, user_answer):
             print(answer)
             # If the answer is right
             if int(answer) == correct.id:
-                print(correct.id)
+                # print(correct.id)
                 got_it_right.extend([question.qtext, correct.atext])
-                print("jó válasz")
+                # print("jó válasz")
             # If the answer is wrong
             else:
                 user_answered = Option.query.get(answer)
                 got_it_right.extend([question.qtext, correct.atext, user_answered.atext])
-    print(got_it_right)
+    # print(got_it_right)
     return got_it_right
 
 # Question shown to the user.
@@ -106,8 +106,8 @@ def question(quiz_link, question_link):
         remaining_questions = session['questions_left']
         # The next question in the quiz.
         next_question = remaining_questions[0]
-        print(f'következő: {next_question}')
-        print(remaining_questions)
+        # print(f'következő: {next_question}')
+        # print(remaining_questions)
         # Saving the answers of the user
         answers = session['answers']
         # Correct answers by the user
@@ -120,10 +120,10 @@ def question(quiz_link, question_link):
         if request.method == "POST":
 
             answer = request.form.getlist('options')
-            print(f"válasz id: {answer}")
+            # print(f"válasz id: {answer}")
             answers.append(answer)
             session['answers'] = answers
-            print(f"megválaszolva: {answers}")
+            # print(f"megválaszolva: {answers}")
 
             result = checker(next_question, answer)
             right_answers.append(result)
@@ -140,9 +140,9 @@ def question(quiz_link, question_link):
             else:
                 remaining_questions.remove(question.id)
                 session['questions_left'] = remaining_questions
-                print(question.id)
+                # print(question.id)
                 next_question = remaining_questions[0]
-                print(f"ennyi kérdés van hátra: {remaining_questions}")
+                # print(f"ennyi kérdés van hátra: {remaining_questions}")
 
                 return redirect(url_for('question', quiz_link=quiz.id, question_link=next_question))
 
@@ -157,16 +157,16 @@ def result():
     got_it_right = session['got_it_right']
     correct_answers = Question.query.filter_by(quiz_id=quiz_id).count()
     messages = Result.query.filter_by(quiz_id=quiz_id).all()
-    print(f"this is the message: {messages}")
-    print(f"Got these right: {got_it_right}")
-    print(correct_answers)
+    # print(f"this is the message: {messages}")
+    # print(f"Got these right: {got_it_right}")
+    # print(correct_answers)
     result = round((session['correct_counter'] / correct_answers) * 100, 2)
-    print(result)
+    # print(result)
     message_to_show = None
     for message in messages:
         if result <= message.range_max and result >= message.range_min:
             message_to_show = message.result
-            print(message_to_show)
+            # print(message_to_show)
 
     return render_template('result.html', result=result, message=message_to_show, got_it_right=got_it_right)
 
@@ -193,13 +193,13 @@ def addquestion():
 
     if form.validate_on_submit():
 
-        # If the quiz has a picture it will save it to the databse.
+        # # If the quiz has a picture it will save it to the databse.
         if form.qpic.data:
             qimage = save_picture(form.qpic.data)
             question = Question(qtext=form.qtext.data, qpic=qimage, quiz_id=quizid)
             db.session.add(question)
             db.session.commit()
-        # If there is no picture it will only save the text.
+        # # If there is no picture it will only save the text.
         else:
             question = Question(qtext=form.qtext.data, quiz_id=quizid)
             db.session.add(question)
@@ -207,12 +207,40 @@ def addquestion():
 
         q_id = question.id
 
+        # for fieldname, value in form.data.items():
+        #     if fieldname == 'atext1':
+        #         option = Option(atext=value, correct=True, question_id=q_id)
+        #         db.session.add(option)
+        #         db.session.commit()
+        #     else:
+        #         option = Option(atext=value, correct = False, question_id=q_id)
+        #         db.session.add(option)
+        #         db.session.commit()
+
+
         # Saving the options to the database
-        alloptions = [[form.atext1.data, form.correct1.data], [form.atext2.data, form.correct2.data], [form.atext3.data, form.correct3.data], [form.atext4.data, form.correct4.data]]
-        for b, c in alloptions:
-            option = Option(atext=b, correct=c, question_id=q_id)
-            db.session.add(option)
-            db.session.commit()
+        options_all = [fieldname for fieldname in form.data.items() if fieldname[0][0:5] == 'atext']
+
+        for answer in options_all:
+            if answer[0] == 'atext1':
+                option = Option(atext=answer[1], correct=True, question_id=q_id)
+                db.session.add(option)
+                db.session.commit()
+            else:
+                option = Option(atext=answer[1], correct=False, question_id=q_id)
+                db.session.add(option)
+                db.session.commit()
+
+        # options_all_copy = [fieldname for fieldname in form.data.items()]
+        # filtered_list = filter(lambda a : a[0][0:5] == 'atext', options_all_copy)
+        # for a in filtered_list:
+        #     print(a)
+
+        # alloptions = [[form.atext1.data, form.correct1.data], [form.atext2.data, form.correct2.data], [form.atext3.data, form.correct3.data], [form.atext4.data, form.correct4.data]]
+        # for b, c in alloptions:
+        #     option = Option(atext=b, correct=c, question_id=q_id)
+        #     db.session.add(option)
+        #     db.session.commit()
 
         flash('Question has been added!', 'success')
 
@@ -240,8 +268,6 @@ def addquiz():
             result = Result(range_min=a, range_max=b, result=c, quiz_id=quiz.id)
             db.session.add(result)
             db.session.commit()
-
-        # ezt ellenőrizni, hogy működik-e és ezt átadni? akkor viszont javítani kell a következő oldalon a paramétereket!
 
         flash('The quiz has been created. Now add a question!', 'success')
 
@@ -339,39 +365,46 @@ def error_403(e):
 def error_500(e):
     return render_template('500.html'), 500
 
-# @app.route('/naq/', methods=["GET", "POST"])
-# def naq():
-#
-#     form = TestQuestion()
-#     #javítani a quiz id részt, melyik legyen a primary key???
-#     quizid = request.args.get('quizid')
-#
-#
-#     if form.validate_on_submit():
-#         pass
-#         # # If the quiz has a picture it will save it to the databse.
-#         # if form.qpic.data:
-#         #     qimage = save_picture(form.qpic.data)
-#         #     question = Question(qtext=form.qtext.data, qpic=qimage, quiz_id=quizid)
-#         #     db.session.add(question)
-#         #     db.session.commit()
-#         # # If there is no picture it will only save the text.
-#         # else:
-#         #     question = Question(qtext=form.qtext.data, quiz_id=quizid)
-#         #     db.session.add(question)
-#         #     db.session.commit()
-#         #
-#         # q_id = question.id
-#         #
-#         # # Saving the options to the database
-#         # alloptions = [[form.atext1.data, form.correct1.data], [form.atext2.data, form.correct2.data], [form.atext3.data, form.correct3.data], [form.atext4.data, form.correct4.data]]
-#         # for b, c in alloptions:
-#         #     option = Option(atext=b, correct=c, question_id=q_id)
-#         #     db.session.add(option)
-#         #     db.session.commit()
-#         #
-#         # flash('Question has been added!', 'success')
-#         #
-#         # return redirect(url_for('addquestion', quizid=quizid))
-#
-#     return render_template('naq.html', form=form)
+
+@app.route('/addnewquestion/', methods=["GET", "POST"])
+def addnewquestion():
+    form = NewQuestioForm()
+    # quizid = request.args.get('quizid')
+    if form.validate_on_submit():
+
+        # # # If the quiz has a picture it will save it to the databse.
+        # if form.qpic.data:
+        #     qimage = save_picture(form.qpic.data)
+        #     question = Question(qtext=form.qtext.data, qpic=qimage, quiz_id=quizid)
+        #     db.session.add(question)
+        #     db.session.commit()
+        # # # If there is no picture it will only save the text.
+        # else:
+        #     question = Question(qtext=form.qtext.data, quiz_id=quizid)
+        #     db.session.add(question)
+        #     db.session.commit()
+        #
+        # q_id = question.id
+        all = form.data.items()
+        print(all)
+
+        # options_all = [fieldname for fieldname in form.data.items()]
+        # print(options_all)
+
+
+        # for answer in options_all:
+        #     if answer[0] == 'atext1':
+        #         option = Option(atext=answer[1], correct=True, question_id=q_id)
+        #         db.session.add(option)
+        #         db.session.commit()
+        #     else:
+        #         option = Option(atext=answer[1], correct=False, question_id=q_id)
+        #         db.session.add(option)
+        #         db.session.commit()
+
+
+        flash('Question has been added!', 'success')
+
+        return redirect(url_for('index'))
+
+    return render_template('addnewquestion.html', form=form)
